@@ -202,6 +202,13 @@ textarea{resize:vertical;min-height:70px}
 .tabs{display:flex;gap:4px;background:rgba(37,69,58,.09);border-radius:999px;padding:4px;margin:20px 0 6px}
 .tabs button{flex:1;border:none;background:transparent;border-radius:999px;padding:9px 10px;font-size:14px;font-weight:600;color:var(--mist)}
 .tabs button.on{background:var(--card);color:var(--forest);box-shadow:0 1px 3px rgba(20,30,24,.18)}
+.daybar{display:flex;gap:8px;overflow-x:auto;padding:8px 2px 12px;scrollbar-width:none}
+.daybar::-webkit-scrollbar{display:none}
+.dchip{flex:none;display:flex;flex-direction:column;align-items:center;min-width:64px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:7px 12px;line-height:1.25}
+.dchip b{font-size:13px;color:var(--forest)}
+.dchip small{font-size:11px;color:var(--mist)}
+.dchip.on{background:var(--forest);border-color:var(--forest)}
+.dchip.on b,.dchip.on small{color:#fff}
 .tabs i{font-style:normal;font-size:11px;margin-left:5px;opacity:.7}
 .edit-go{display:grid;grid-template-columns:1fr 84px;gap:6px;margin:10px 0 0;padding-left:12px}
 .edit-go input[data-f=go-note]{grid-column:1/3}
@@ -457,7 +464,8 @@ function pick(c){
 /* ───────── 畫面：旅程詳情 ───────── */
 function dayDate(t,i){if(!t.start)return '';var s=addDays(t.start,i),d=parse(s);return (d.getMonth()+1)+'/'+d.getDate()+'（'+WEEK[d.getDay()]+'）';}
 /* 地圖：有選過地點就用「名稱＋地址」搜尋；預覽小地圖用座標，位置最準 */
-var OPEN={},tripTab='days';
+var OPEN={},tripTab='days',dayIdx=-1;
+function pickDay(t){var n=(t.days||[]).length,k=todayStr();return (t.start&&k>=t.start&&k<=t.end)?Math.min(diffDays(t.start,k),Math.max(n-1,0)):0;}
 function mapQuery(t,text,pl){
   if(pl&&(pl.name||pl.addr))return [pl.name,pl.addr].filter(Boolean).join(' ');
   return text+' '+((t.cities&&t.cities[0])||cname(t.cc));
@@ -663,7 +671,14 @@ function renderTrip(keep){
   if(nb||!READONLY)h+='<div class="tabs"><button type="button" data-act="tab" data-tab="days" class="'+(tab==='days'?'on':'')+'">📅 每日行程'+(nd?'<i>'+nd+'</i>':'')+'</button>'
     +'<button type="button" data-act="tab" data-tab="bk" class="'+(tab==='bk'?'on':'')+'">🎫 預訂小卡'+(nb?'<i>'+nb+'</i>':'')+'</button></div>';
   if(tab==='bk'){h+=bookingsHtml(t)+'</div>';$('#app').innerHTML=h;window.scrollTo({top:y,behavior:'instant'});return;}
+  if(dayIdx<0)dayIdx=pickDay(t);
+  dayIdx=Math.max(0,Math.min(dayIdx,nd-1));
+  if(nd)h+='<div class="daybar">'+t.days.map(function(d,di){
+    var dt=t.start?parse(addDays(t.start,di)):null;
+    return '<button type="button" class="dchip'+(di===dayIdx?' on':'')+'" data-act="day" data-d="'+di+'"><b>DAY '+(di+1)+'</b><small>'+(dt?(dt.getMonth()+1)+'/'+dt.getDate()+' '+WEEK[dt.getDay()]:'　')+'</small></button>';
+  }).join('')+'</div>';
   (t.days||[]).forEach(function(d,di){
+    if(di!==dayIdx)return;
     h+='<section class="day"><div class="day-head"><div><div class="day-no">DAY '+pad(di+1)+(dayDate(t,di)?' · '+dayDate(t,di):'')+'</div>'
       +(ed?'<input data-f="dtitle" data-d="'+di+'" value="'+esc(d.title)+'" placeholder="這天的主題，例如：京都市區散步" style="margin:6px 0">':'<div class="day-title">'+esc(d.title||'')+'</div>')+'</div>'
       +(ed?'<button class="xbtn" data-act="del-day" data-d="'+di+'" title="刪除這一天">🗑</button>':'')+'</div>';
@@ -677,7 +692,9 @@ function renderTrip(keep){
   if(!(t.days||[]).length&&!ed)h+='<div class="welcome"><p>這趟旅程還沒有每日行程。'+(READONLY?'':'<br>按右上角「✎ 編輯行程」開始規劃。')+'</p></div>';
   if(ed)h+='<div style="margin-top:14px;text-align:center"><button class="btn" data-act="add-day">＋ 新增一天</button></div>';
   h+='</div>';
-  $('#app').innerHTML=h;window.scrollTo({top:y,behavior:'instant'});
+  $('#app').innerHTML=h;
+  var on=$('.dchip.on');if(on)on.scrollIntoView({inline:'center',block:'nearest',behavior:'instant'});
+  window.scrollTo({top:y,behavior:'instant'});
 }
 
 /* ───────── 表單視窗 ───────── */
@@ -758,6 +775,7 @@ document.addEventListener('click',function(e){
     else if(a==='sample'){D.trips=D.trips.concat(sample());save();renderHome();}
     else if(a==='home'){editing=false;location.hash='';}
     else if(a==='edit-toggle'){editing=!editing;tripTab='days';renderTrip(true);}
+    else if(a==='day'){dayIdx=di;renderTrip(true);}
     else if(a==='tab'){editing=false;tripTab=b.getAttribute('data-tab');renderTrip(true);}
     else if(a==='toggle-map'){var mk=di+'-'+ri;OPEN[mk]=!OPEN[mk];renderTrip(true);}
     else if(a==='bk-new')bookingForm();
@@ -774,8 +792,8 @@ document.addEventListener('click',function(e){
     else if(a==='pick-cover')$('#fileCover').click();
     else if(a==='clear-cover'){formCover='';$('#coverPrev').style.backgroundImage='';}
     else if(a==='delete-trip'){if(confirm('確定刪除這趟旅程？無法復原。')){D.trips=D.trips.filter(function(x){return x.id!==b.getAttribute('data-id');});save();closeModal();editing=false;location.hash='';route();}}
-    else if(a==='add-day'){t=curT();t.days=t.days||[];t.days.push({title:'',rows:[{time:'',act:'',note:''}]});save();renderTrip(true);}
-    else if(a==='del-day'){if(confirm('刪除這一天？')){curT().days.splice(di,1);OPEN={};save();renderTrip(true);}}
+    else if(a==='add-day'){t=curT();t.days=t.days||[];t.days.push({title:'',rows:[{time:'',act:'',note:''}]});dayIdx=t.days.length-1;save();renderTrip(true);}
+    else if(a==='del-day'){if(confirm('刪除這一天？')){curT().days.splice(di,1);OPEN={};dayIdx=Math.max(0,di-1);save();renderTrip(true);}}
     else if(a==='add-row'){curT().days[di].rows.push({time:'',act:'',note:''});save();renderTrip(true);}
     else if(a==='del-row'){curT().days[di].rows.splice(ri,1);OPEN={};save();renderTrip(true);}
     else if(a==='backup'){D.lastBackup=todayStr();save();download('旅行地圖備份-'+todayStr()+'.json',JSON.stringify(D),'application/json');if(view==='home')renderHome();}
@@ -839,7 +857,7 @@ function route(){
   if(m&&D.trips.some(function(t){return t.id===m[1];})){view='trip';curTrip=m[1];renderTrip();}
   else{view='home';renderHome();}
 }
-window.addEventListener('hashchange',function(){editing=false;OPEN={};tripTab='days';hideSug();route();});
+window.addEventListener('hashchange',function(){editing=false;OPEN={};tripTab='days';dayIdx=-1;hideSug();route();});
 load();
 document.title=D.title;
 route();
