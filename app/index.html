@@ -173,16 +173,31 @@ textarea{resize:vertical;min-height:70px}
 .edit-row .pl{grid-column:2/3;font-size:11px;color:var(--forest-mid)}
 
 /* 預訂小卡 */
-.bk{display:flex;gap:12px;align-items:flex-start;background:var(--card);border-radius:16px;border-left:4px solid var(--forest-mid);padding:14px;margin-bottom:10px;box-shadow:0 1px 0 var(--line);cursor:pointer}
-.bk:hover{background:#fff}
+.bk{display:block;background:var(--card);border-radius:16px;margin-bottom:12px;box-shadow:0 1px 0 var(--line),0 10px 24px -16px rgba(20,30,24,.4);overflow:hidden;cursor:pointer;transition:transform .15s}
+.bk:hover{transform:translateY(-1px)}
 .bk.past{opacity:.55}
-.bk-ico{font-size:26px;line-height:1.2}
+.bk-top{display:flex;gap:12px;align-items:flex-start;padding:14px 14px 13px}
+.bk-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none;background:var(--t)}
 .bk-main{flex:1;min-width:0}
-.bk-meta{font-size:11px;color:var(--mist);letter-spacing:.06em}
-.bk-title{font-size:16px;font-weight:600;word-break:break-word}
-.bk-code{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:14px;background:#fff;border:1px dashed var(--forest-mid);border-radius:8px;padding:1px 8px;margin-top:6px;letter-spacing:.08em;word-break:break-all}
+.bk-meta{font-size:12px;color:#5b6b61;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bk-chip{background:var(--c);color:#fff;border-radius:999px;padding:1px 9px;font-size:11px;font-weight:700;letter-spacing:.04em}
+.bk-title{font-size:16px;font-weight:600;word-break:break-word;margin-top:4px}
 .bk-sub{font-size:12px;color:#5b6b61;margin-top:4px}
 .bk-thumb{width:46px;height:46px;border-radius:8px;background-size:cover;background-position:center;flex:none}
+.bk-stub{position:relative;display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-top:2px dashed var(--line);background:rgba(255,255,255,.6)}
+.bk-stub::before,.bk-stub::after{content:"";position:absolute;top:-8px;width:14px;height:14px;border-radius:50%;background:var(--bg)}
+.bk-stub::before{left:-7px}.bk-stub::after{right:-7px}
+.bk-stub small{font-size:10px;color:var(--mist);letter-spacing:.14em;display:block}
+.bk-code{font-family:ui-monospace,Menlo,monospace;font-size:16px;font-weight:700;letter-spacing:.08em;word-break:break-all;color:var(--c)}
+.bk-ppl{font-size:12px;color:#5b6b61;text-align:right}
+/* 點到點之間的交通 */
+.rows li.leg{padding:2px 0 4px 18px;font-size:12px;color:var(--forest-mid)}
+.rows li.leg::before{display:none}
+.rows li.leg span{background:#fff;border:1px dashed var(--line);border-radius:999px;padding:2px 10px;display:inline-block}
+.rows li.leg a{margin-left:6px;color:var(--forest-mid)}
+.edit-go{display:grid;grid-template-columns:1fr 84px;gap:6px;margin:10px 0 0;padding-left:12px}
+.edit-go input[data-f=go-note]{grid-column:1/3}
+.edit-go select,.edit-go input{font-size:13px;padding:6px 8px;background:#f4f1e8}
 .bk-hint{font-size:12px;color:var(--mist);text-align:center;padding:10px 4px}
 .bk-prev{height:110px;border-radius:12px;background:#ddd center/contain no-repeat;margin-bottom:8px}
 .show-ico{font-size:44px;line-height:1.1}
@@ -271,10 +286,10 @@ function sample(){
       desc:'搭古董電車、吃蛋塔，再往北到波爾圖。',cover:'',
       days:[{title:'抵達與老城區',rows:[
           {time:'15:00',act:'阿爾法瑪老城區散步',note:'',place:{name:'阿爾法瑪',addr:'葡萄牙 里斯本',lat:38.7114,lon:-9.13}},
-          {time:'19:30',act:'Time Out Market',note:'晚餐',place:{name:'Time Out Market Lisboa',addr:'Av. 24 de Julho 49, Lisboa',lat:38.7067,lon:-9.1459}}]},
+          {time:'19:30',act:'Time Out Market',note:'晚餐',go:{mode:'metro',min:'20',note:'綠線轉 28 號電車'},place:{name:'Time Out Market Lisboa',addr:'Av. 24 de Julho 49, Lisboa',lat:38.7067,lon:-9.1459}}]},
         {title:'貝倫區',rows:[
           {time:'10:00',act:'貝倫塔',note:'',place:{name:'貝倫塔',addr:'Av. Brasília, Lisboa',lat:38.6916,lon:-9.216}},
-          {time:'12:30',act:'Pastéis de Belém 蛋塔',note:'排隊很快',place:{name:'Pastéis de Belém',addr:'R. de Belém 84-92, Lisboa',lat:38.6975,lon:-9.2032}}]}],
+          {time:'12:30',act:'Pastéis de Belém 蛋塔',note:'排隊很快',go:{mode:'walk',min:'12',note:'沿河邊走'},place:{name:'Pastéis de Belém',addr:'R. de Belém 84-92, Lisboa',lat:38.6975,lon:-9.2032}}]}],
       bookings:[
         {id:uid(),type:'flight',title:'示範航空 XX123　TPE → LIS',date:addDays(t,60),date2:'',time:'23:50',code:'X7K9QP',people:'2 位 · 經濟艙',addr:'',phone:'',note:'提前 3 小時到機場',img:'',place:null},
         {id:uid(),type:'stay',title:'里斯本河岸旅店（範例）',date:addDays(t,61),date2:addDays(t,66),time:'15:00',code:'HB-482913',people:'雙人房 · 含早餐',addr:'Rua Augusta 100, Lisboa',phone:'+351 21 000 0000',note:'入住前可免費寄放行李',img:'',place:null},
@@ -444,6 +459,13 @@ function mapEmbed(t,text,pl){
   var q=(pl&&pl.lat!=null&&pl.lon!=null)?pl.lat+','+pl.lon+'('+String(pl.name||text).replace(/[()]/g,' ')+')':mapQuery(t,text,pl);
   return 'https://maps.google.com/maps?q='+encodeURIComponent(q)+'&z=15&output=embed';
 }
+function goHtml(t,prev,r){
+  var g=r.go;if(!g||!(g.mode||g.min||g.note))return '';
+  var m=GO[g.mode]||GO.other,mm=+g.min,dur=mm?(mm>=60?Math.floor(mm/60)+' 小時'+(mm%60?' '+mm%60+' 分':''):mm+' 分'):'';
+  var nav=(prev&&prev.act&&r.act)?'<a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&origin='+encodeURIComponent(mapQuery(t,prev.act,prev.place))
+    +'&destination='+encodeURIComponent(mapQuery(t,r.act,r.place))+(m[2]?'&travelmode='+m[2]:'')+'">導航</a>':'';
+  return '<li class="leg"><span>'+m[0]+' '+[g.mode?m[1]:'',dur,g.note?esc(g.note):''].filter(Boolean).join(' · ')+'</span>'+nav+'</li>';
+}
 function rowView(t,di,ri,r){
   var open=!!OPEN[di+'-'+ri]&&!!r.act;
   return '<li>'+(r.time?'<span class="r-time">'+esc(r.time)+'</span>':'')+'<span class="r-act">'+esc(r.act)+'</span>'
@@ -452,6 +474,13 @@ function rowView(t,di,ri,r){
    +(r.place&&r.place.addr?'<span class="r-note">'+esc(r.place.addr)+'</span>':'')
    +(r.note?'<span class="r-note">'+esc(r.note)+'</span>':'')
    +(open?'<iframe class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="地圖預覽" src="'+esc(mapEmbed(t,r.act,r.place))+'"></iframe>':'')+'</li>';
+}
+function goEdit(di,ri,r){
+  var g=r.go||{},at=' data-d="'+di+'" data-r="'+ri+'"';
+  return '<div class="edit-go"><select data-f="go-mode"'+at+'><option value="">↓ 從上一個地點怎麼去？</option>'
+   +Object.keys(GO).map(function(k){return '<option value="'+k+'"'+(g.mode===k?' selected':'')+'>'+GO[k][0]+' '+GO[k][1]+'</option>';}).join('')+'</select>'
+   +'<input data-f="go-min" type="number" min="0" inputmode="numeric"'+at+' value="'+esc(g.min||'')+'" placeholder="分鐘">'
+   +'<input data-f="go-note"'+at+' value="'+esc(g.note||'')+'" placeholder="路線／備註，例如：JR 奈良線、2 號出口"></div>';
 }
 function rowEdit(di,ri,r){
   return '<div class="edit-row"><input data-f="time" data-d="'+di+'" data-r="'+ri+'" value="'+esc(r.time)+'" placeholder="時間">'
@@ -462,7 +491,10 @@ function rowEdit(di,ri,r){
 }
 
 /* ───────── 預訂小卡 ───────── */
-var BK={flight:['✈️','機票'],stay:['🏨','住宿'],food:['🍽️','餐廳訂位'],transit:['🚆','交通'],ticket:['🎫','票券'],other:['📌','其他']};
+var BK={flight:['✈️','機票','#1e5878','#e0eef5'],stay:['🏨','住宿','#8a5a1e','#f5ead7'],food:['🍽️','餐廳訂位','#bf5038','#f8e4de'],
+  transit:['🚆','交通','#3a6b55','#e0eee6'],ticket:['🎫','票券','#4a3a6b','#e9e4f3'],other:['📌','其他','#5b6b61','#e8ebe6']};
+var GO={walk:['🚶','步行','walking'],metro:['🚇','捷運／電車','transit'],bus:['🚌','公車','transit'],train:['🚄','火車／新幹線','transit'],
+  taxi:['🚕','計程車','driving'],car:['🚗','開車','driving'],bike:['🚲','單車','bicycling'],flight:['✈️','飛機',''],boat:['⛴️','船',''],other:['➡️','其他','']};
 var mdw=function(s){var d=parse(s);return (d.getMonth()+1)+'/'+d.getDate()+'（'+WEEK[d.getDay()]+'）';};
 function bkWhen(b){
   var s='';
@@ -475,12 +507,11 @@ function bkQuery(t,b){return b.addr||(b.title+' '+((t.cities&&t.cities[0])||cnam
 function bkLink(t,b){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(bkQuery(t,b));}
 function bkCard(b){
   var ty=BK[b.type]||BK.other,end=b.date2||b.date,past=!!end&&end<todayStr();
-  return '<div class="bk'+(past?' past':'')+'" data-act="bk-show" data-id="'+b.id+'"><div class="bk-ico">'+ty[0]+'</div><div class="bk-main">'
-   +'<div class="bk-meta">'+ty[1]+(bkWhen(b)?' · '+esc(bkWhen(b)):'')+'</div><div class="bk-title">'+esc(b.title)+'</div>'
-   +(b.code?'<span class="bk-code">'+esc(b.code)+'</span>':'')
-   +(b.people?'<div class="bk-sub">'+esc(b.people)+'</div>':'')
+  return '<div class="bk'+(past?' past':'')+'" style="--c:'+ty[2]+';--t:'+ty[3]+'" data-act="bk-show" data-id="'+b.id+'"><div class="bk-top"><div class="bk-ico">'+ty[0]+'</div><div class="bk-main">'
+   +'<div class="bk-meta"><span class="bk-chip">'+ty[1]+'</span>'+(bkWhen(b)?'<span>'+esc(bkWhen(b))+'</span>':'')+'</div><div class="bk-title">'+esc(b.title)+'</div>'
    +(b.addr?'<div class="bk-sub">📍 '+esc(b.addr)+'</div>':'')+'</div>'
-   +(b.img?'<div class="bk-thumb" style="background-image:url('+b.img+')"></div>':'')+'</div>';
+   +(b.img?'<div class="bk-thumb" style="background-image:url('+b.img+')"></div>':'')+'</div>'
+   +((b.code||b.people)?'<div class="bk-stub"><div>'+(b.code?'<small>代號</small><span class="bk-code">'+esc(b.code)+'</span>':'')+'</div>'+(b.people?'<div class="bk-ppl">'+esc(b.people)+'</div>':'')+'</div>':'')+'</div>';
 }
 function bookingsHtml(t){
   var L=(t.bookings||[]).slice().sort(function(a,b){return bkKey(a)<bkKey(b)?-1:1;});
@@ -625,9 +656,9 @@ function renderTrip(keep){
       +(ed?'<input data-f="dtitle" data-d="'+di+'" value="'+esc(d.title)+'" placeholder="這天的主題，例如：京都市區散步" style="margin:6px 0">':'<div class="day-title">'+esc(d.title||'')+'</div>')+'</div>'
       +(ed?'<button class="xbtn" data-act="del-day" data-d="'+di+'" title="刪除這一天">🗑</button>':'')+'</div>';
     if(ed){
-      h+=d.rows.map(function(r,ri){return rowEdit(di,ri,r);}).join('')+'<button class="btn small add-line" data-act="add-row" data-d="'+di+'">＋ 新增一行</button>';
+      h+=d.rows.map(function(r,ri){return (ri?goEdit(di,ri,r):'')+rowEdit(di,ri,r);}).join('')+'<button class="btn small add-line" data-act="add-row" data-d="'+di+'">＋ 新增一行</button>';
     }else{
-      h+=d.rows.length?'<ul class="rows">'+d.rows.map(function(r,ri){return rowView(t,di,ri,r);}).join('')+'</ul>':'<div class="empty-day">這天還沒有行程</div>';
+      h+=d.rows.length?'<ul class="rows">'+d.rows.map(function(r,ri){return (ri?goHtml(t,d.rows[ri-1],r):'')+rowView(t,di,ri,r);}).join('')+'</ul>':'<div class="empty-day">這天還沒有行程</div>';
     }
     h+='</section>';
   });
@@ -765,7 +796,8 @@ document.addEventListener('input',function(e){
     if(parseGmaps(el.value.trim()))return;   /* 貼上地圖網址：交給地點搜尋處理 */
     var r=t.days[di].rows[ri];r.act=el.value;
     if(r.place&&r.place.name!==el.value)delete r.place;   /* 手動改字後，不再綁定原本選的地點 */
-  }else t.days[di].rows[ri][f]=el.value;
+  }else if(f.indexOf('go-')===0){var rr=t.days[di].rows[ri];rr.go=rr.go||{};rr.go[f.slice(3)]=el.value;}
+  else t.days[di].rows[ri][f]=el.value;
   save();
 });
 $('#fileBk').addEventListener('change',function(){
